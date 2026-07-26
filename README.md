@@ -1,3 +1,5 @@
+[🇬🇧 English](README.md) | [🇹🇷 Türkçe](README_TR.md) | [🇩🇪 Deutsch](README_DE.md)
+
 # OpenCode NVIDIA API Integration
 
 Professional setup script for configuring [OpenCode](https://opencode.ai) with NVIDIA's API models (Nemotron 3 Ultra, Nemotron 4 Ultra, Nemotron 3 Ultra Instruct, etc.) via the OpenAI-compatible API endpoint.
