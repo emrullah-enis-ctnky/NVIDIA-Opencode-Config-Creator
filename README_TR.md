@@ -1,21 +1,24 @@
 # OpenCode NVIDIA API Entegrasyonu
 
-[NVIDIA API modelleri](https://build.nvidia.com/explore/discover) (Nemotron 3 Ultra, Nemotron 4 Ultra, Nemotron 3 Ultra Instruct vb.) ile [OpenCode](https://opencode.ai) kullanımı için profesyonel kurulum scripti.
+[NVIDIA API modelleri](https://build.nvidia.com/explore/discover) (Nemotron 3 Ultra, Nemotron 4 Ultra, Nemotron 3 Ultra Instruct, MiniMax, Qwen, DeepSeek vb.) ile [OpenCode](https://opencode.ai) kullanımı için profesyonel kurulum scriptleri.
 
 [🇬🇧 English](../README.md) | [🇩🇪 Deutsch](README_DE.md)
 
 ## Özellikler
 
-- **Çoklu shell desteği**: Bash, Zsh, Fish
+- **Çapraz platform**: Linux, macOS, Windows (WSL, PowerShell, CMD)
+- **Çoklu shell desteği**: Bash, Zsh, Fish, PowerShell 5.1+, pwsh 7+, Git Bash, WSL
 - **Profesyonel arayüz**: Truecolor çıktı, Unicode ikonlar, animasyonlu spinner
 - **Güvenli API key girişi**: Gizli input + format doğrulama (`nvapi-...`)
 - **İdempotent**: Birden fazla güvenli çalıştırma
-- **Sağlam JSON işleme**: `jq` varsa kullanır, yoksa bash fallback
-- **Shell entegrasyonu**: `.bashrc`, `.zshrc`, `config.fish` otomatik güncelleme
+- **Sağlam JSON işleme**: Native JSON (PowerShell) / `jq` + `sed` fallback (Bash)
+- **Shell entegrasyonu**: `.bashrc`, `.zshrc`, `config.fish`, PowerShell profile otomatik güncelleme
 - **Dry-run modu**: Değişiklik öncesi önizleme
-- **Önceden yapılandırılmış modeller**: Nemotron 3 Ultra, Nemotron 4 Ultra, Nemotron 3 Ultra Instruct
+- **Önceden yapılandırılmış modeller**: MiniMax M2.7, Qwen3 Coder 480B, DeepSeek V3.2
 
 ## Hızlı Başlangıç
+
+### Linux / macOS / WSL (Bash/Zsh/Fish)
 
 ```bash
 # Depoyu klonla
@@ -27,7 +30,26 @@ chmod +x setup-opencode.sh
 ./setup-opencode.sh
 ```
 
-### Tek Satır Kurulum
+### Windows (PowerShell 5.1+ / pwsh 7+)
+
+```powershell
+# Depoyu klonla
+git clone https://github.com/emrullah-enis-ctnky/NVIDIA-Opencode-Config-Creator.git
+cd NVIDIA-Opencode-Config-Creator
+
+# PowerShell scriptini çalıştır
+.\setup-opencode.ps1
+```
+
+### Windows (CMD / Batch)
+
+```cmd
+git clone https://github.com/emrullah-enis-ctnky/NVIDIA-Opencode-Config-Creator.git
+cd NVIDIA-Opencode-Config-Creator
+setup-opencode.bat
+```
+
+### Tek Satır Kurulum (Linux/macOS/WSL)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/emrullah-enis-ctnky/NVIDIA-Opencode-Config-Creator/main/setup-opencode.sh | bash
@@ -36,25 +58,40 @@ curl -fsSL https://raw.githubusercontent.com/emrullah-enis-ctnky/NVIDIA-Opencode
 ### Önce Test Et (Dry Run)
 
 ```bash
+# Linux/macOS/WSL
 ./setup-opencode.sh --dry-run
+
+# Windows PowerShell
+.\setup-opencode.ps1 -DryRun
+
+# Windows CMD
+setup-opencode.bat --dry-run
 ```
 
 ## Ön Koşullar
 
 | Gereksinim | Versiyon | Notlar |
 |------------|----------|--------|
-| Bash | 4.0+ | Çoğu Linux/macOS'ta varsayılan |
+| Bash | 4.0+ | Linux/macOS/WSL için |
+| PowerShell | 5.1+ | Windows için (varsayılan) |
+| pwsh | 7+ | Windows için (önerilen - truecolor, Unicode) |
 | curl | Herhangi | İndirme için (script için gerekli değil) |
-| jq | 1.6+ | **Önerilir** - JSON işleme için |
+| jq | 1.6+ | **Önerilir** - Linux/macOS'ta JSON işleme için |
 | NVIDIA API Key | - | [build.nvidia.com](https://build.nvidia.com/explore/discover) adresinden alın |
 
 ### Shell Desteği
 
-| Shell | Config Dosyası | Durum |
-|-------|----------------|-------|
-| Bash | `~/.bashrc` | ✅ Tam destek |
-| Zsh | `~/.zshrc` | ✅ Tam destek |
-| Fish | `~/.config/fish/config.fish` | ✅ Tam destek |
+| Platform | Shell | Config Dosyası | Durum |
+|----------|-------|----------------|-------|
+| Linux/macOS/WSL | Bash | `~/.bashrc` | ✅ Tam destek |
+| Linux/macOS/WSL | Zsh | `~/.zshrc` | ✅ Tam destek |
+| Linux/macOS/WSL | Fish | `~/.config/fish/config.fish` | ✅ Tam destek |
+| Windows | PowerShell 5.1 | `Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1` | ✅ Tam destek |
+| Windows | pwsh 7+ | `Documents\PowerShell\Microsoft.PowerShell_profile.ps1` | ✅ Tam destek |
+| Windows | Git Bash | `~/.bashrc` | ✅ Tam destek |
+| Windows | WSL Bash | `~/.bashrc` | ✅ Tam destek |
+| Windows | Fish | `%APPDATA%\fish\config.fish` | ✅ Tam destek |
+| Windows | CMD | PowerShell profil üzerinden | ✅ Desteklenir |
 
 ## NVIDIA API Key Alma
 
@@ -69,15 +106,19 @@ Script key formatını doğrular (`nvapi-` prefix + 20+ karakter).
 
 ## Script Ne Yapar?
 
-1. **Shell tespiti** (bash/zsh/fish)
-2. **Config dizini oluşturur**: `~/.config/opencode/`
-3. **Şablonu kopyalar** `~/.config/opencode/opencode.json` olarak
-4. **API key ister** (gizli input)
+1. **Shell tespiti** (bash/zsh/fish/powershell/pwsh/git bash/wsl/fish)
+2. **Config dizini oluşturur**:
+   - Linux/macOS/WSL: `~/.config/opencode/`
+   - Windows: `%APPDATA%\opencode\`
+3. **Şablonu kopyalar** `opencode.json` olarak
+4. **API key ister** (gizli input - PowerShell'de masked, Bash'de hidden)
 5. **Config'i günceller** API key ile
-6. **Environment variable** set eder: `OPENCODE_CONFIG_FILE` shell RC dosyasında
+6. **Environment variable** set eder: `OPENCODE_CONFIG_FILE` shell RC/profile dosyasında
 7. **Özet gösterir** yeniden başlatma talimatlarıyla
 
 ## Kurulum Sonrası
+
+### Linux / macOS / WSL
 
 Shell'i yeniden başlatın veya source edin:
 
@@ -92,6 +133,26 @@ source ~/.config/fish/config.fish
 Sonra OpenCode'u başlatın:
 
 ```bash
+opencode
+```
+
+### Windows (PowerShell)
+
+```powershell
+# Profil'i yeniden yükle
+. $PROFILE
+
+# OpenCode test et
+opencode
+```
+
+### Windows (CMD)
+
+```cmd
+REM Terminali yeniden başlatın veya:
+powershell -ExecutionPolicy Bypass -File $PROFILE
+
+REM OpenCode test et
 opencode
 ```
 
@@ -238,15 +299,18 @@ chmod +x setup-opencode.sh
 
 ```
 .
-├── README.md                 # Bu dosya
+├── README.md                 # English version
+├── README_TR.md              # Bu dosya (Türkçe)
 ├── README_DE.md              # Almanca versiyon
 ├── opencode-template.json    # OpenCode config şablonu
-└── setup-opencode.sh         # Ana kurulum scripti
+├── setup-opencode.sh         # Ana kurulum scripti (Linux/macOS/WSL: bash/zsh/fish)
+├── setup-opencode.ps1        # PowerShell kurulum scripti (Windows: PowerShell 5.1+, pwsh 7+)
+└── setup-opencode.bat        # Batch/CMD kurulum scripti (Windows: cmd.exe)
 ```
 
 ## Şablon Konfigürasyonu
 
-`opencode-template.json` OpenAI-uyumlu provider kullanır:
+`opencode-template.json` OpenAI-uyumlu provider kullanır, NVIDIA Build'da mevcut modellerle önceden yapılandırılmış:
 
 ```json
 {
@@ -260,14 +324,18 @@ chmod +x setup-opencode.sh
         "apiKey": "nvapi-YOUR_API_KEY_HERE"
       },
       "models": {
-        "nvidia/nemotron-3-ultra": { "name": "Nemotron 3 Ultra" },
-        "nvidia/nemotron-4-ultra": { "name": "Nemotron 4 Ultra" },
-        "nvidia/nemotron-3-ultra-instruct": { "name": "Nemotron 3 Ultra Instruct" }
+        "minimaxai/minimax-m2.7": { "name": "MiniMax M2.7" },
+        "qwen/qwen3-coder-480b-a35b-instruct": { "name": "Qwen3 Coder 480B" },
+        "deepseek-ai/deepseek-v3.2": { "name": "DeepSeek V3.2" }
       }
     }
   }
 }
 ```
+
+Script çalıştırmadan önce `opencode-template.json` dosyasını, veya sonrasında `~/.config/opencode/opencode.json` (Linux/macOS) / `%APPDATA%\opencode\opencode.json` (Windows) dosyasını düzenleyin:
+
+[NVIDIA Build](https://build.nvidia.com/explore/discover) adresinde bulunan herhangi bir modeli, model ID formatında ekleyebilirsiniz.
 
 ## Gereksinimler
 

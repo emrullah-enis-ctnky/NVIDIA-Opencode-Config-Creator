@@ -2,20 +2,24 @@
 
 # OpenCode NVIDIA API Integration
 
-Professionelles Setup-Skript zur Konfiguration von [OpenCode](https://opencode.ai) mit NVIDIA API-Modellen (Nemotron 3 Ultra, Nemotron 4 Ultra, Nemotron 3 Ultra Instruct, etc.) über den OpenAI-kompatiblen API-Endpunkt.
+Professionelle Setup-Skripte zur Konfiguration von [OpenCode](https://opencode.ai) mit NVIDIA API-Modellen (Nemotron, MiniMax, Qwen, DeepSeek, etc.) über den OpenAI-kompatiblen API-Endpunkt.
 
 ## Funktionen
 
-- **Cross-Shell Support**: Bash, Zsh, Fish
+- **Cross-Plattform**: Linux, macOS, Windows (WSL, PowerShell, CMD)
+- **Cross-Shell Support**: Bash, Zsh, Fish, PowerShell 5.1+, pwsh 7+, Git Bash, WSL
 - **Professionelle UI**: Truecolor-Ausgabe, Unicode-Icons, animierte Spinner
 - **Sichere API-Key-Eingabe**: Versteckte Eingabe mit Format-Validierung (`nvapi-...`)
 - **Idempotent**: Mehrfach ausführbar ohne Probleme
-- **Robuste JSON-Verarbeitung**: Nutzt `jq` mit `sed`-Fallback
+- **Robuste JSON-Verarbeitung**: Native JSON (PowerShell) / `jq` mit `sed`-Fallback (Bash)
 - **Intelligente Shell-RC-Updates**: Idempotente export/set-Operationen
 - **Dry-Run, Help, Version Flags**
 - **Schöne Zusammenfassung** mit Neustart-Anweisungen
+- **Vor konfigurierte Modelle**: MiniMax M2.7, Qwen3 Coder 480B, DeepSeek V3.2
 
 ## Schnellstart
+
+### Linux / macOS / WSL (Bash/Zsh/Fish)
 
 ```bash
 # Repository klonen
@@ -29,11 +33,30 @@ chmod +x setup-opencode.sh
 ./setup-opencode.sh
 ```
 
+### Windows (PowerShell 5.1+ / PowerShell 7+)
+
+```powershell
+# Repository klonen
+git clone https://github.com/emrullah-enis-ctnky/NVIDIA-Opencode-Config-Creator.git
+cd NVIDIA-Opencode-Config-Creator
+
+# Setup ausführen
+.\setup-opencode.ps1
+```
+
+### Windows (Command Prompt / CMD)
+
+```cmd
+git clone https://github.com/emrullah-enis-ctnky/NVIDIA-Opencode-Config-Creator.git
+cd NVIDIA-Opencode-Config-Creator
+setup-opencode.bat
+```
+
 Das Skript:
-1. Erkennt Ihre Shell (bash/zsh/fish)
-2. Erstellt `~/.config/opencode/opencode.json` aus Template
+1. Erkennt Ihre Shell (bash/zsh/fish/powershell/pwsh/git bash/wsl/fish)
+2. Erstellt `~/.config/opencode/opencode.json` (Linux/macOS) oder `%APPDATA%\opencode\opencode.json` (Windows)
 3. Fragt NVIDIA API Key ab (sichere versteckte Eingabe)
-4. Setzt `OPENCODE_CONFIG_FILE` in Ihrer Shell-RC-Datei
+4. Setzt `OPENCODE_CONFIG_FILE` in Ihrer Shell-RC/Profil-Datei
 5. Zeigt Zusammenfassung mit Neustart-Anweisungen
 
 ## Voraussetzungen
@@ -41,7 +64,21 @@ Das Skript:
 - **OpenCode** installiert (`npm install -g opencode-ai` oder [Install-Skript](https://opencode.ai/docs/installation))
 - **Node.js** 18+ (von OpenCode benötigt)
 - **NVIDIA API Key** von [build.nvidia.com](https://build.nvidia.com)
-- **jq** (optional, aber empfohlen für robuste JSON-Verarbeitung)
+- **jq** (optional, aber empfohlen für robuste JSON-Verarbeitung auf Linux/macOS)
+
+### Shell-Unterstützung
+
+| Plattform | Shell | Config-Datei | Status |
+|-----------|-------|--------------|--------|
+| Linux/macOS/WSL | Bash | `~/.bashrc` | ✅ Voll |
+| Linux/macOS/WSL | Zsh | `~/.zshrc` | ✅ Voll |
+| Linux/macOS/WSL | Fish | `~/.config/fish/config.fish` | ✅ Voll |
+| Windows | PowerShell 5.1 | `Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1` | ✅ Voll |
+| Windows | pwsh 7+ | `Documents\PowerShell\Microsoft.PowerShell_profile.ps1` | ✅ Voll |
+| Windows | Git Bash | `~/.bashrc` | ✅ Voll |
+| Windows | WSL Bash | `~/.bashrc` | ✅ Voll |
+| Windows | Fish | `%APPDATA%\fish\config.fish` | ✅ Voll |
+| Windows | CMD | PowerShell Profil | ✅ Unterstützt |
 
 ## Skript-Optionen
 
@@ -56,7 +93,11 @@ Optionen:
 
 ## Erstellte Dateien
 
-### Config: `~/.config/opencode/opencode.json`
+### Config-Datei
+
+**Linux/macOS/WSL:** `~/.config/opencode/opencode.json`
+**Windows:** `%APPDATA%\opencode\opencode.json`
+
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
@@ -69,16 +110,17 @@ Optionen:
         "apiKey": "nvapi-IHR_ECHTER_KEY"
       },
       "models": {
-        "nvidia/nemotron-3-ultra": { "name": "Nemotron 3 Ultra" },
-        "nvidia/nemotron-4-ultra": { "name": "Nemotron 4 Ultra" },
-        "nvidia/nemotron-3-ultra-instruct": { "name": "Nemotron 3 Ultra Instruct" }
+        "minimaxai/minimax-m2.7": { "name": "MiniMax M2.7" },
+        "qwen/qwen3-coder-480b-a35b-instruct": { "name": "Qwen3 Coder 480B" },
+        "deepseek-ai/deepseek-v3.2": { "name": "DeepSeek V3.2" }
       }
     }
   }
 }
 ```
 
-### Shell RC Update
+### Shell RC / Profil Update
+
 ```bash
 # Bash/Zsh (~/.bashrc, ~/.zshrc)
 export OPENCODE_CONFIG_FILE="$HOME/.config/opencode/opencode.json"
@@ -87,7 +129,17 @@ export OPENCODE_CONFIG_FILE="$HOME/.config/opencode/opencode.json"
 set -Ux OPENCODE_CONFIG_FILE "$HOME/.config/opencode/opencode.json"
 ```
 
+```powershell
+# PowerShell 5.1 (~\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1)
+$env:OPENCODE_CONFIG_FILE = "$env:APPDATA\opencode\opencode.json"
+
+# PowerShell 7+ (~\Documents\PowerShell\Microsoft.PowerShell_profile.ps1)
+$env:OPENCODE_CONFIG_FILE = "$env:APPDATA\opencode\opencode.json"
+```
+
 ## Nach der Installation
+
+### Linux / macOS / WSL
 
 ```bash
 # Shell neu starten oder RC-Datei laden
@@ -99,15 +151,35 @@ source ~/.config/fish/config.fish  # fish
 opencode
 ```
 
+### Windows (PowerShell)
+
+```powershell
+# Shell neu starten oder Profil laden
+. $PROFILE
+
+# OpenCode testen
+opencode
+```
+
+### Windows (CMD)
+
+```cmd
+REM Terminal neu starten oder:
+powershell -ExecutionPolicy Bypass -File $PROFILE
+
+REM OpenCode testen
+opencode
+```
+
 ## Enthaltene Modelle
 
 | Model ID | Anzeigename |
 |----------|-------------|
-| `nvidia/nemotron-3-ultra` | Nemotron 3 Ultra |
-| `nvidia/nemotron-4-ultra` | Nemotron 4 Ultra |
-| `nvidia/nemotron-3-ultra-instruct` | Nemotron 3 Ultra Instruct |
+| `minimaxai/minimax-m2.7` | MiniMax M2.7 |
+| `qwen/qwen3-coder-480b-a35b-instruct` | Qwen3 Coder 480B |
+| `deepseek-ai/deepseek-v3.2` | DeepSeek V3.2 |
 
-Weitere Modelle: `~/.config/opencode/opencode.json` bearbeiten und [NVIDIA Build](https://build.nvidia.com/explore/discover) nach Model-IDs durchsuchen.
+Weitere Modelle: `~/.config/opencode/opencode.json` (Linux/macOS) oder `%APPDATA%\opencode\opencode.json` (Windows) bearbeiten und [NVIDIA Build](https://build.nvidia.com/explore/discover) nach Model-IDs durchsuchen.
 
 ## NVIDIA API Key erhalten
 
@@ -164,6 +236,8 @@ chmod +x setup-opencode.sh
 
 Falls Sie manuell konfigurieren möchten:
 
+### Linux / macOS / WSL
+
 1. **Template kopieren**:
    ```bash
    mkdir -p ~/.config/opencode
@@ -183,6 +257,27 @@ Falls Sie manuell konfigurieren möchten:
 
 4. **Shell neu starten** und mit `opencode` testen
 
+### Windows (PowerShell)
+
+1. **Template kopieren**:
+   ```powershell
+   New-Item -ItemType Directory -Force -Path "$env:APPDATA\opencode"
+   Copy-Item opencode-template.json "$env:APPDATA\opencode\opencode.json"
+   ```
+
+2. **API Key eintragen** in `%APPDATA%\opencode\opencode.json`
+
+3. **PowerShell Profil erweitern**:
+   ```powershell
+   # PowerShell 5.1
+   Add-Content $PROFILE.CurrentUserAllHosts "`$env:OPENCODE_CONFIG_FILE = `"$env:APPDATA\opencode\opencode.json`""
+   
+   # PowerShell 7+ (pwsh)
+   Add-Content $PROFILE.CurrentUserAllHosts "`$env:OPENCODE_CONFIG_FILE = `"$env:APPDATA\opencode\opencode.json`""
+   ```
+
+4. **Shell neu starten** und mit `opencode` testen
+
 ## Dateistruktur
 
 ```
@@ -191,12 +286,14 @@ Falls Sie manuell konfigurieren möchten:
 ├── README_TR.md              # Türkische Version
 ├── README_DE.md              # Deutsche Version
 ├── opencode-template.json    # OpenCode Config Template
-└── setup-opencode.sh         # Haupt-Setup-Skript
+├── setup-opencode.sh         # Haupt-Setup-Skript (Linux/macOS/WSL: bash/zsh/fish)
+├── setup-opencode.ps1        # PowerShell Setup-Skript (Windows: PowerShell 5.1+, pwsh 7+)
+└── setup-opencode.bat        # Batch/CMD Setup-Skript (Windows: cmd.exe)
 ```
 
 ## Template-Konfiguration
 
-Die `opencode-template.json` nutzt den OpenAI-kompatiblen Provider:
+Die `opencode-template.json` nutzt den OpenAI-kompatiblen Provider mit vorkonfigurierten Modellen von NVIDIA Build:
 
 ```json
 {
@@ -210,9 +307,9 @@ Die `opencode-template.json` nutzt den OpenAI-kompatiblen Provider:
         "apiKey": "nvapi-YOUR_API_KEY_HERE"
       },
       "models": {
-        "nvidia/nemotron-3-ultra": { "name": "Nemotron 3 Ultra" },
-        "nvidia/nemotron-4-ultra": { "name": "Nemotron 4 Ultra" },
-        "nvidia/nemotron-3-ultra-instruct": { "name": "Nemotron 3 Ultra Instruct" }
+        "minimaxai/minimax-m2.7": { "name": "MiniMax M2.7" },
+        "qwen/qwen3-coder-480b-a35b-instruct": { "name": "Qwen3 Coder 480B" },
+        "deepseek-ai/deepseek-v3.2": { "name": "DeepSeek V3.2" }
       }
     }
   }
